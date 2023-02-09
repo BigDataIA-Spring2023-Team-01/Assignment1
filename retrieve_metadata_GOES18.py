@@ -36,7 +36,7 @@ write_logs(bucket)
 write_logs(prefix)
 
 # Connect to SQLite database
-conn = sqlite3.connect("s3_goes.db")
+conn = sqlite3.connect("results/s3_goes.db")
 cursor = conn.cursor()
 
 # Create table to store file names

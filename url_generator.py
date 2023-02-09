@@ -3,6 +3,7 @@ import boto3
 import time
 import dotenv
 import requests
+import re
 clientlogs = boto3.client('logs',
                         region_name= 'us-east-1',
                         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY'),
@@ -44,8 +45,9 @@ def write_logs(message: str):
 )   
 def check_filename(url, filename):
     response = requests.get(url)
+
     if response.status_code == 200:
-        if filename in response.text:
+        if filename in url:
             return True
         else:
             return False
@@ -70,18 +72,32 @@ def file_validator(file_name):
             print(check)
             if(check):
                 return '0'
-            else:
-                return '2'
     
     else:
         return '1'
+    
+    return '2'
 
-df = file_validator("OR_ABI-L1b-RadC-M6C01_G18_s20230410001170_e20230410003543_c20230410003571.nc")
-# df = check_filename('https://noaa-goes18.s3.amazonaws.com/index.html#ABI-L1b-RadC/2023/041/00/','OR_ABI-L1b-RadC-M6C01_G18_s20230410001170_e20230410003543_c20230410003571.nc')
-#print(df)
-# input_string = "KABR20230210_000240_V06"
 
-# test = "OR_ABI-L2-DSRC-M6_G18_s20223180501179_e20223180503552_c20223180508262.nc"
-# url_gen_nexrad(input_string)
-# #url_gen(test)
 
+def file_validator_nexrad(file_name):
+    # define the expected format for the file name
+    expected_format = "{nexrad_station}{year}{month}{day}_{time}_V06"
+    
+    pattern = r'^\w{4}\d{8}_\d{6}(?:_V06|_V03)?(?:\.gz)?$'
+
+    if re.match(pattern, file_name):
+        url = url_gen_nexrad(file_name)
+        check = check_filename(url,file_name)
+        if(check):
+            return '0' #File name is valid and it exists
+    else:
+        return '1'  #File name is invalid
+    return '2'      #FIle name is valid but file dosent exist in url
+
+   
+
+
+df = file_validator('OR_ABI-L1b-RadC-M6C01_G18_s20222550301172_e20222550303545_c20222550303583.nc')
+# df = file_validator('OR_ABI-L1b-RadC-M6C01_G18_s20230410001170_e20230410003543_c20230410003571.nc')
+print(df)
