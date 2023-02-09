@@ -26,7 +26,7 @@ def query_into_dataframe():
     print(df)
 
 
-
+#level 0 = 2022, level 1 = 2023
 def create_list(result,level):
     l = []
     for o in result.get('CommonPrefixes'):
