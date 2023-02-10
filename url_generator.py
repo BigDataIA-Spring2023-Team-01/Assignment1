@@ -6,7 +6,7 @@ def url_gen_goes(input):
     date = arr[3]
     year, day_of_year, hour = date[1:5], date[5:8], date[8:10]
     fs = "https://noaa-goes18.s3.amazonaws.com/{}/{}/{}/{}/{}".format(finalProductCode,year,day_of_year,hour,input)
-    print(fs)
+    return fs
 
 
 def url_gen_nexrad(input):
@@ -16,9 +16,12 @@ def url_gen_nexrad(input):
     return fs
 
 
-input_string = "KBYX20150804_000940_V06.gz"
+
+
+
+input_string = "KABR20230210_000240_V06"
 
 test = "OR_ABI-L2-DSRC-M6_G18_s20223180501179_e20223180503552_c20223180508262.nc"
-url_gen_goes(test)
+url_gen_nexrad(input_string)
 #url_gen(test)
 

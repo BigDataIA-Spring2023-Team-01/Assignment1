@@ -11,6 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 from nexrad_db import retieve_days,retieve_months,retieve_stations
+from url_generator import url_gen_nexrad
 
 # from IPython.core.display import display, HTML
 load_dotenv()
@@ -108,9 +109,13 @@ with col1:
             if(selected_file != 'select'):
                 if check_file_exists(name_of_file, USER_BUCKET_NAME):
                     st.write(f"The file {name_of_file} already exists in the {USER_BUCKET_NAME} bucket.")
+                    st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
+                    st.write('Link to file on GEOS website',url_gen_nexrad(name_of_file))
                 else:
                     st.write(f"The file {name_of_file} does not exist in the {USER_BUCKET_NAME} bucket.")
                     transfer_file_to_S3()
+                    st.write('Link to file on GEOS website',url_gen_nexrad(name_of_file))
+
 
             
 
