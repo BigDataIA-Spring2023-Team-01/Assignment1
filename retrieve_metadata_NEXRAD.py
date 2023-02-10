@@ -29,12 +29,24 @@ def write_logs(message: str):
     ]   
 )  
 
-conn = sqlite3.connect("results/s3_nexrad.db")
+conn = sqlite3.connect("s3_nexrad.db")
 cursor = conn.cursor()
+write_logs("Connecting to SQLite database")
 
-cursor.execute("CREATE TABLE IF NOT EXISTS folders (year text, month text, day text,nexrad_station text)")
+cursor.execute("CREATE TABLE IF NOT EXISTS folders (month text, day text,nexrad_station text, Is2022 text)")
 bucket = 'noaa-nexrad-level2'
+year = ['2022','2023']
+write_logs("bucket name")
 write_logs(bucket)
+write_logs("year 2022, 2023")
+#write_logs(year)
+write_logs("Creating table")
+
+
+def query_into_dataframe():
+    write_logs("fetching objects in nexrad s3 bucket")
+    df = pd.read_sql_query("SELECT * FROM folders", conn)
+    print(df)
 
 
 
@@ -43,38 +55,49 @@ def create_list(result,level):
     for o in result.get('CommonPrefixes'):
         val = o.get("Prefix").split('/')
         l.append(val[level])
-
+    #write_logs(l)    
     return l
+    
+def retrieve_metadata_NEXRAD(bucket,prefix,level):
+    month,day,nexrad_station = [],[],[]
+    result = s3.list_objects(Bucket=bucket, Prefix=prefix, Delimiter='/')
+    month = create_list(result,1)
 
-def retrieve_metadata_NEXRAD(bucket):
-    year,month,day,nexrad_station = ['2022','2023'],[],[],[]
-    for i in range(len(year)):
-        prefix = str(year[i]) + "/"
-        result = s3.list_objects_v2(Bucket=bucket, Prefix=prefix, Delimiter='/')
-        month = create_list(result,1)
-        print(month)
-        for j in range(len(month)):
-            tprefix = prefix + str(month[j]) + "/"
-            result = s3.list_objects_v2(Bucket=bucket, Prefix=tprefix, Delimiter='/')
-            day = create_list(result,2)
-            print(day)
-            for n in range(len(day)):
-                ttprefix = tprefix + str(day[n]) + "/"
-                result = s3.list_objects_v2(Bucket=bucket, Prefix=ttprefix, Delimiter='/')
-                nexrad_station = create_list(result,3)
-                print(nexrad_station)
-                populate_db(year[i],month[j],day[n],nexrad_station)
+    for i in month:
+        tprefix = prefix + str(i) + "/"
+        result_1 = s3.list_objects(Bucket=bucket, Prefix=tprefix, Delimiter='/')
+        dy = create_list(result_1,2)
+        day.append(dy)
 
-def populate_db(year,month, day,nexrad_station):
-    cursor.execute("INSERT INTO folders VALUES(?,?,?,?)",(year,month,day,str(nexrad_station)))
+        for j in dy:
+            ttprefix = tprefix + str(j) + "/"
+            result_2 = s3.list_objects(Bucket=bucket, Prefix=ttprefix, Delimiter='/')
+            h = create_list(result_2,3)
+            nexrad_station.append(h)
 
+    populate_db(month,day,nexrad_station,level)
 
-retrieve_metadata_NEXRAD(bucket)
+def populate_db(month, day,nexrad_station,level):
+    i = 0
+    for y in month:
+        day_aaray = day[i]
+        j = 0
+        for d in day_aaray:
+            nexrad_station_array = nexrad_station[j]
+            for h in nexrad_station_array:
+                
+                cursor.execute("INSERT INTO folders VALUES(?,?,?,?)",(y,d,h,level))
+            j+=1
+        i+=1
+write_logs("Db_populated")
+write_logs(f'User Input:{populate_db}')
+
+for i in range(len(year)):
+    prefix = year[i] + '/'
+    retrieve_metadata_NEXRAD(bucket,prefix,i)
 # Commit the changes to the database
-# cursor.execute('''update table folders set nexrad_station = 'DOP1' where day = '01' and "month" = '02' and Is2023 = '1' ''' )
-
 conn.commit()
-
+query_into_dataframe()
 
 # Close the connection to the database
 conn.close()

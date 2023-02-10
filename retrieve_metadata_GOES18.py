@@ -29,23 +29,27 @@ def write_logs(message: str):
     ]   
 )  
 
-
 bucket = 'noaa-goes18'
 prefix = 'ABI-L1b-RadC/'
+write_logs("bucket name")
 write_logs(bucket)
+write_logs("prefix")
 write_logs(prefix)
 
 # Connect to SQLite database
-conn = sqlite3.connect("results/s3_goes.db")
+conn = sqlite3.connect("s3_goes.db")
 cursor = conn.cursor()
+write_logs("Connecting to SQLite database")
 
 # Create table to store file names
 cursor.execute("CREATE TABLE IF NOT EXISTS folders (year text, day_of_year text,hour text)")
 write_logs("Creating table")
 
 def query_into_dataframe():
+    write_logs("fetching objects in NOAA s3 bucket")
     df = pd.read_sql_query("SELECT * FROM folders", conn)
     print(df)
+
 
 
 #level 0 = 2022, level 1 = 2023
@@ -54,8 +58,9 @@ def create_list(result,level):
     for o in result.get('CommonPrefixes'):
         val = o.get("Prefix").split('/')
         l.append(val[level])
+        return l
     write_logs(l)        
-    return l
+    
 
 def retrieve_metadata(bucket,prefix):
     year,day_of_year,hour = [],[],[]
@@ -67,6 +72,7 @@ def retrieve_metadata(bucket,prefix):
         result_1 = s3.list_objects(Bucket=bucket, Prefix=tprefix, Delimiter='/')
         doy = create_list(result_1,2)
         day_of_year.append(doy)
+        
 
         for j in doy:
             ttprefix = tprefix + str(j) + "/"
@@ -76,6 +82,7 @@ def retrieve_metadata(bucket,prefix):
 
     populate_db(year,day_of_year,hour)
 
+       
 def populate_db(year, day_of_year,hour):
     i = 0
     for y in year:
@@ -88,8 +95,11 @@ def populate_db(year, day_of_year,hour):
                 cursor.execute("INSERT INTO folders VALUES(?,?,?)",(y,d,h))
             j+=1
         i+=1
-    
 write_logs("Db_populated")
+write_logs(f'User Input:{populate_db}')
+
+
+
 
 retrieve_metadata(bucket,prefix)
 # Commit the changes to the database
