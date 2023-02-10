@@ -44,7 +44,7 @@ if cursor.fetchone():
     
     
     for row in rows:
-        convert_coordinates(row[3])
+        convert_coordinates(row[4])
 else:
     print(f"Table '{table_name}' does not exist")
     conn = sqlite3.connect("results/ddl.dbo")

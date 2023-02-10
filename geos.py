@@ -111,10 +111,14 @@ with col1:
                 if check_file_exists(name_of_file, USER_BUCKET_NAME):
                     st.write(f"The file {name_of_file} already exists in the S3: {USER_BUCKET_NAME} bucket.")
                     st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
+                    get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
+
+                    st.success('File was Successfully retireved!', icon="✅")
                 else:
                     st.write(f"The file {name_of_file} does not exist in the S3: {USER_BUCKET_NAME} bucket.")
                     transfer_file_to_S3()
                     get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
+                    st.success('File was Successfully retireved!', icon="✅")
 
 with col2:
     

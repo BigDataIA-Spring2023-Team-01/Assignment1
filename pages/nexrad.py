@@ -30,6 +30,8 @@ USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 col1, col2 = st.columns(2, gap = 'large')
 
 with col1:
+    st.header("Search using fields ")
+
     
     # check_file_exists
     def check_file_exists(filename, bucket_name):
@@ -111,16 +113,21 @@ with col1:
                     st.write(f"The file {name_of_file} already exists in the {USER_BUCKET_NAME} bucket.")
                     st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
                     st.write('Link to file on GEOS website',url_gen_nexrad(name_of_file))
+                    st.success('File was Successfully retireved!', icon="✅")
                 else:
                     st.write(f"The file {name_of_file} does not exist in the {USER_BUCKET_NAME} bucket.")
                     transfer_file_to_S3()
                     st.write('Link to file on GEOS website',url_gen_nexrad(name_of_file))
+                    st.success('File was Successfully retireved!', icon="✅")
+
 
 
             
 
 
 with col2:
+    st.header("Search using file name ")
+
     def generate_url_from_filename():
         # Get the filename entered by the user
         filename = st.text_input("Enter the filename:")
