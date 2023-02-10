@@ -12,17 +12,6 @@ from bs4 import BeautifulSoup
 import time
 # from IPython.core.display import display, HTML
 
-#AWS KEYS 
-AWS_ACCESS_KEY = 'AKIASHB6SWSVFEFZXW2Q'
-AWS_SECRET_KEY = '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'
-USER_BUCKET_NAME = 'team01'
-region_name='us-east-1'
- 
-s3client = boto3.client('s3',
-                        region_name='us-east-1',
-                        aws_access_key_id = 'AKIASHB6SWSVFEFZXW2Q', 
-                        aws_secret_access_key = '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'
-                        )
 
 col1, col2 = st.columns(2)
 
