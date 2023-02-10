@@ -10,6 +10,8 @@ import io
 import requests
 from bs4 import BeautifulSoup
 import time
+
+from goes_db import retieve_year, retieve_day_of_year,retieve_hour
 # from IPython.core.display import display, HTML
 st.header("Explore the GEOS-18 Dataset")
 load_dotenv()
@@ -22,53 +24,10 @@ bucket = 'noaa-goes18'
 prefix = 'ABI-L1b-RadC/'
 USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 
-col1, col2 = st.columns(2, gap = 'large')
+
+col1, col2 = st.columns(2)
 
 with col1:
-    #Selecting station 
-    station_geos = st.text_input(
-        'Please select the station', placeholder= 'GEOS 18')
-
-    #Selecting Year
-    year_geos = st.selectbox(
-        'Please select the year',
-        ('2022', '2023'))
-
-
-    #Day of Year
-    day_of_year_geos = st.text_input('Day of Year ', max_chars=3, type='default', 
-                                    placeholder='Please enter Date of Year in DDD format ')
-
-    #Hour of Day
-    hour_of_day = st.text_input('Enter Hour of Day', max_chars=2, placeholder='Enter Hour in 24H format')
-
-    bucket = 'noaa-goes18'
-    prefix = 'ABI-L1b-RadC/{}/{}/{}/'.format(year_geos,day_of_year_geos,hour_of_day)
-
-
-    #Filename selector 
-    def list_files_as_dropdown(bucket_name, prefix):
-        try:
-            result = s3client.list_objects(Bucket=bucket_name, Prefix=prefix, Delimiter ='/')
-            object_list = [x["Key"].split("/")[-1] for x in result["Contents"]]
-            selected_object = st.selectbox("Select file for download:", object_list)
-            return selected_object
-        except Exception as e:
-            st.write("An error occurred:", e)
-            return None
-
-    selected_file = list_files_as_dropdown(bucket, prefix)
-
-    if selected_file:
-        st.write("You selected:", selected_file)
-    else:
-        st.write("No objects found")
-
-    # https://noaa-goes18.s3.amazonaws.com/index.html#ABI-L1b-RadC/2023/001/00/
-    final_url = 'https://{}.s3.amazonaws.com/index.html#ABI-L1b-RadC/{}/{}/{}/{}'.format(bucket,year_geos,day_of_year_geos,hour_of_day,selected_file)
-    name_of_file = selected_file
-
-    # check_file_exists
     def check_file_exists(filename, bucket_name):
         try:
             s3client.head_object(Bucket=bucket_name, Key=filename)
@@ -107,10 +66,48 @@ with col1:
         except Exception as e:
             st.write("An error occurred:", str(e))
 
+    def list_files_as_dropdown(bucket_name, prefix):
+        try:
+            result = s3client.list_objects(Bucket=bucket_name, Prefix=prefix, Delimiter ='/')
+            object_list = [x["Key"].split("/")[-1] for x in result["Contents"]]
+            return object_list
+        except Exception as e:
+            st.write("An error occurred:", e)
+            return None
+        
+
+    #Selecting station 
+    station_geos = st.text_input(
+        'Please select the station', placeholder= 'GEOS 18')
+
+    #Selecting Year
+    year_geos = st.selectbox(
+        'Please select the year',
+        options=retieve_year())
+
+    #Day of Year
+    day_of_year_geos = st.selectbox('Please select the Day of Year', options=retieve_day_of_year(year_geos))
+
+    hour_of_day = st.selectbox(
+                'Please select the Hour',
+                options=retieve_hour(year_geos,day_of_year_geos))
+
+
+
     #Transfering selected file to S3 bucket 
     if st.button('Submit'):
         with st.spinner('Retrieving details for the file you selected, wait for it....!'):
             time.sleep(3)
+            time.sleep(5)
+            bucket = 'noaa-goes18'
+            prefix = 'ABI-L1b-RadC/{}/{}/{}/'.format(year_geos,day_of_year_geos,hour_of_day)
+        object_list = list_files_as_dropdown(bucket, prefix)
+        selected_file = st.selectbox("Select file for download:", options =object_list)
+        final_url = 'https://{}.s3.amazonaws.com/index.html#ABI-L1b-RadC/{}/{}/{}/{}'.format(bucket,year_geos,day_of_year_geos,hour_of_day,selected_file)
+        name_of_file = selected_file
+    
+   
+        if(selected_file != 'select'):
             if check_file_exists(name_of_file, USER_BUCKET_NAME):
                 st.write(f"The file {name_of_file} already exists in the S3: {USER_BUCKET_NAME} bucket.")
                 st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
