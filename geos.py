@@ -25,9 +25,10 @@ prefix = 'ABI-L1b-RadC/'
 USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 
 
-col1, col2 = st.columns(2)
+col1, col2 = st.columns(2,gap='large')
 
 with col1:
+    st.header("Search using fields ")
     def check_file_exists(filename, bucket_name):
         try:
             s3client.head_object(Bucket=bucket_name, Key=filename)
@@ -117,9 +118,12 @@ with col1:
 
 with col2:
     
+    st.header("Search using file name ")
+
     def generate_url_from_filename():
         # Get the filename entered by the user
         filename = st.text_input("Enter the filename:")
+
         if filename:
             if st.button("Go to website"):
                 with st.spinner('Fetching link to GEOS bucket and downloading...'):

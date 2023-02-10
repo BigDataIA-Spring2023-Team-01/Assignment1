@@ -78,17 +78,18 @@ with col1:
     #Day of Month
     day_of_month_nexrad = st.selectbox('Please select the Day of the month',options=retieve_days(flag,month_of_year_nexrad))
 
-    bucket = 'noaa-nexrad-level2'
-    prefix = '{}/{}/{}/'.format(year_nexrad,month_of_year_nexrad,day_of_month_nexrad)
+  
 
     #Station code selector 
     
-    selected_stationcode = st.selectbox('Please select the Day of the month',options=retieve_stations(flag,month_of_year_nexrad,day_of_month_nexrad),key='day')
+    selected_stationcode = st.selectbox('Please select the station',options=retieve_stations(flag,month_of_year_nexrad,day_of_month_nexrad),key='day')
 
 
 
     #MADE CHANGES TO BELOW FUNCTION - ADDED PREFIX_FILE 
     prefix_file = '{}/{}/{}/{}/'.format(year_nexrad,month_of_year_nexrad,day_of_month_nexrad,selected_stationcode)
+    bucket = 'noaa-nexrad-level2'
+    prefix = '{}/{}/{}/'.format(year_nexrad,month_of_year_nexrad,day_of_month_nexrad)
     #Filename selector 
     
 
@@ -109,6 +110,8 @@ with col1:
                 else:
                     st.write(f"The file {name_of_file} does not exist in the {USER_BUCKET_NAME} bucket.")
                     transfer_file_to_S3()
+
+            
 
 
 with col2:
