@@ -19,7 +19,7 @@ s3client = boto3.client('s3',region_name='us-east-1',
 
 bucket = 'noaa-goes18'
 prefix = 'ABI-L1b-RadC/'
-
+USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 
 col1, col2 = st.columns(2)
 
@@ -102,7 +102,7 @@ with col1:
                 s3client.upload_file(selected_file, USER_BUCKET_NAME, name_of_file)
                 with st.spinner('Almost there...'):
                     time.sleep(5)
-                    st.write("File uploaded successfully")
+                    st.write("File uploaded successfully!")
             st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
         except Exception as e:
             st.write("An error occurred:", str(e))
@@ -120,30 +120,6 @@ with col1:
 
 with col2:
 
-    # # filename_entered = st.text_input("Enter filename for download", placeholder='OR_ABI-L1b-RadC-M6C01_G18_s20230212001171_e20230212003548_c20230212003594.nc')
-    # def generate_url_from_filename():
-    #     # Get the filename entered by the user
-    #     filename = st.text_input("Enter the filename:")
-    #     if filename:
-    #         if st.button("Go to website"):
-    #             with st.spinner('Fetching link to file... '):
-    #                 time.sleep(3)
-
-    #                 # Base URL of the Nexrad website
-    #                 base_url = "https://noaa-nexrad-level2.s3.amazonaws.com/index.html#"
-                    
-    #                 # Combine the base URL with the year, day of year, and hour to get the URL
-    #                 file_url = base_url + filename
-                    
-    #                 # Display the URL
-    #                 st.write("Access :", file_url)
-
-    # generate_url_from_filename()
-
-    # https://noaa-nexrad-level2.s3.amazonaws.com/index.html#2023/02/01/KABR/
-    # https://noaa-nexrad-level2.s3.amazonaws.com/index.html2023/02/01/KABR/
-    # KABR20230201_000458_V06
-
     def generate_url_from_filename():
         # Get the filename entered by the user
         filename = st.text_input("Enter the filename:")
@@ -155,19 +131,14 @@ with col2:
                     parts = filename.split("_")
                     
                     # Get the year, day of year, and hour from the filename
-                    # KABR20230201
+            
                     station_code = parts[0][:4]
                     year = parts[0][4:8]
                     day_of_year = parts[0][8:10]
                     hour = parts[0][10:]
                     
                     # Base URL of the Nexrad website
-                    base_url = "https://noaa-nexrad-level2.s3.amazonaws.com/index.html#{}/{}/{}/{}/".format(year,day_of_year,hour,station_code)
-                    
-                    # Combine the base URL with the year, day of year, and hour to get the URL
-                    # file_url = base_url + f"{year}/{day_of_year}/{hour}/{station_code}/"
-                    
-                    # Display the URL
+                    base_url = "https://noaa-nexrad-level2.s3.amazonaws.com/{}/{}/{}/{}/{}".format(year,day_of_year,hour,station_code,filename)
                     st.write("Access link:", base_url)
 
     generate_url_from_filename()
