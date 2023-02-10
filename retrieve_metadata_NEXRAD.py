@@ -13,13 +13,9 @@ s3 = boto3.client('s3',region_name='us-east-1',
 conn = sqlite3.connect("s3_nexrad.db")
 cursor = conn.cursor()
 
-cursor.execute("CREATE TABLE IF NOT EXISTS folders (month text, day text,nexrad_station text, Is2022 text)")
+cursor.execute("CREATE TABLE IF NOT EXISTS folders (month text, day text,nexrad_station text, Is2023 text)")
 bucket = 'noaa-nexrad-level2'
 year = ['2022','2023']
-
-def query_into_dataframe():
-    df = pd.read_sql_query("SELECT * FROM folders", conn)
-    print(df)
 
 
 
@@ -68,7 +64,7 @@ for i in range(len(year)):
     retrieve_metadata_NEXRAD(bucket,prefix,i)
 # Commit the changes to the database
 conn.commit()
-query_into_dataframe()
+
 
 # Close the connection to the database
 conn.close()
