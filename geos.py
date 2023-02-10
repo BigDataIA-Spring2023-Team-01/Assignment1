@@ -24,11 +24,8 @@ bucket = 'noaa-goes18'
 prefix = 'ABI-L1b-RadC/'
 USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 
-<<<<<<< Updated upstream
-col1, col2 = st.columns(2, gap = 'large')
-=======
+
 col1, col2 = st.columns(2)
->>>>>>> Stashed changes
 
 with col1:
     def check_file_exists(filename, bucket_name):
@@ -100,9 +97,7 @@ with col1:
     #Transfering selected file to S3 bucket 
     if st.button('Submit'):
         with st.spinner('Retrieving details for the file you selected, wait for it....!'):
-<<<<<<< Updated upstream
             time.sleep(3)
-=======
             time.sleep(5)
             bucket = 'noaa-goes18'
             prefix = 'ABI-L1b-RadC/{}/{}/{}/'.format(year_geos,day_of_year_geos,hour_of_day)
@@ -113,7 +108,6 @@ with col1:
     
    
         if(selected_file != 'select'):
->>>>>>> Stashed changes
             if check_file_exists(name_of_file, USER_BUCKET_NAME):
                 st.write(f"The file {name_of_file} already exists in the S3: {USER_BUCKET_NAME} bucket.")
                 st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
