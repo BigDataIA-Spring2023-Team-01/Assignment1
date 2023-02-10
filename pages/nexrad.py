@@ -94,7 +94,8 @@ with col1:
     
 
     object_list = list_files_as_dropdown(bucket, prefix_file)
-    selected_file = st.selectbox("Select file for download:", object_list,key='file')
+    if(object_list != None):
+        selected_file = st.selectbox("Select file for download:", object_list,key='file')
 
 
     #Transfering selected file to S3 bucket 
