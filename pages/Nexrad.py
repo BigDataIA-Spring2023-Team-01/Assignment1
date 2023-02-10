@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 import time
 from nexrad_db import retieve_days,retieve_months,retieve_stations
 from url_generator import url_gen_nexrad
+from goes_db import log_file_download
 
 # from IPython.core.display import display, HTML
 load_dotenv()
@@ -114,6 +115,8 @@ with col1:
 
                     st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
                     st.write('Link to file on GEOS website',url_gen_nexrad(name_of_file))
+                    timestamp = time.time()
+                    log_file_download(name_of_file,timestamp,bucket)
                 else:
                     st.write(f"The file {name_of_file} does not exist in the {USER_BUCKET_NAME} bucket.")
                     transfer_file_to_S3()

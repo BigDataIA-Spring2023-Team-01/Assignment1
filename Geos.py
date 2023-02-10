@@ -10,6 +10,8 @@ import io
 import requests
 from bs4 import BeautifulSoup
 import time
+from goes_db import log_file_download
+from url_generator import file_validator
 
 from goes_db import retieve_year, retieve_day_of_year,retieve_hour
 # from IPython.core.display import display, HTML
@@ -112,6 +114,8 @@ with col1:
                     st.success(f"The file {name_of_file} already exists in the {USER_BUCKET_NAME} bucket.", icon="✅")
                     st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
                     get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
+                    timestamp = time.time()
+                    log_file_download(name_of_file,timestamp,bucket)
 
                 else:
                     st.write(f"The file {name_of_file} does not exist in the S3: {USER_BUCKET_NAME} bucket.")
@@ -122,15 +126,23 @@ with col2:
     
     st.header("Search using file name ")
 
+
+        
+
     def generate_url_from_filename():
         # Get the filename entered by the user
         filename = st.text_input("Enter the filename:")
-
-        if filename:
-            if st.button("Go to website"):
+        flag = '1'
+        if st.button("Go to website"):
+            flag = file_validator(filename)
+            if (flag == '0'):
                 with st.spinner('Fetching link to GEOS bucket and downloading...'):
                     time.sleep(3)
                     get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
+            elif (flag == '1'):
+                st.warning("Enter Valid file name")
+            elif (flag == '2') :
+                st.warning("File not present in GOES Bucket")
 
     generate_url_from_filename()
 
