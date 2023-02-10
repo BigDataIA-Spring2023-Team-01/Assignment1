@@ -4,11 +4,30 @@ import os
 import logging
 from dotenv import load_dotenv
 import pandas as pd
+import time
 
 load_dotenv()
 s3 = boto3.client('s3',region_name='us-east-1',
                         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY'),
                         aws_secret_access_key = os.environ.get('AWS_SECRET_KEY'))
+
+clientlogs = boto3.client('logs',
+                        region_name= 'us-east-1',
+                        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY'),
+                        aws_secret_access_key = os.environ.get('AWS_SECRET_KEY')
+                        )
+
+def write_logs(message: str):
+    clientlogs.put_log_events(
+    logGroupName =  "Assignment_1",
+    logStreamName = "nexrad",
+    logEvents= [
+        {
+            'timestamp' : int(time.time() * 1e3),
+            'message' : message,
+        }
+    ]   
+)  
 
 conn = sqlite3.connect("s3_nexrad.db")
 cursor = conn.cursor()
@@ -16,7 +35,7 @@ cursor = conn.cursor()
 cursor.execute("CREATE TABLE IF NOT EXISTS folders (month text, day text,nexrad_station text, Is2023 text)")
 bucket = 'noaa-nexrad-level2'
 year = ['2022','2023']
-
+write_logs(bucket)
 
 
 def create_list(result,level):
