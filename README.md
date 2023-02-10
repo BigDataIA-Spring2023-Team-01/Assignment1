@@ -10,4 +10,16 @@ We are also plotting the NEXRAD doppler radar's location using streamlit in whic
 
 [Application](https://bigdataia-spring2023-team-01-assignment1-geos-p8hd9b.streamlit.app/)
 
+WE ATTEST THAT WE HAVEN’T USED ANY OTHER STUDENTS’ WORK IN OUR ASSIGNMENT
+AND ABIDE BY THE POLICIES LISTED IN THE STUDENT HANDBOOK
+
+Contribution
+
+Anandita Deb         (002788337) :25%
+
+Cheril Yogi          (002790646) :25%
+
+Shamin Chokshi       (002763957) :25%
+
+Thejas Bharadwaj     (002727189) :25%
 
