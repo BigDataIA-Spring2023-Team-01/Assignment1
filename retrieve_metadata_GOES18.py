@@ -11,12 +11,29 @@ s3 = boto3.client('s3',region_name='us-east-1',
                         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY'),
                         aws_secret_access_key = os.environ.get('AWS_SECRET_KEY'))
 
+clientlogs = boto3.client('logs',
+                        region_name= 'us-east-1',
+                        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY'),
+                        aws_secret_access_key = os.environ.get('AWS_SECRET_KEY')
+                        )
 
+def write_logs(message: str):
+    clientlogs.put_log_events(
+    logGroupName =  "Assignment_1",
+    logStreamName = "GOES18",
+    logEvents= [
+        {
+            'timestamp' : int(time.time() * 1e3),
+            'message' : message,
+        }
+    ]   
+)  
 
 
 bucket = 'noaa-goes18'
 prefix = 'ABI-L1b-RadC/'
-
+write_logs(bucket)
+write_logs(prefix)
 
 # Connect to SQLite database
 conn = sqlite3.connect("s3_goes.db")
@@ -24,7 +41,7 @@ cursor = conn.cursor()
 
 # Create table to store file names
 cursor.execute("CREATE TABLE IF NOT EXISTS folders (year text, day_of_year text,hour text)")
-
+write_logs("Creating table")
 
 def query_into_dataframe():
     df = pd.read_sql_query("SELECT * FROM folders", conn)
@@ -37,7 +54,7 @@ def create_list(result,level):
     for o in result.get('CommonPrefixes'):
         val = o.get("Prefix").split('/')
         l.append(val[level])
-        
+    write_logs(l)        
     return l
 
 def retrieve_metadata(bucket,prefix):
@@ -72,7 +89,7 @@ def populate_db(year, day_of_year,hour):
             j+=1
         i+=1
     
-
+write_logs("Db_populated")
 
 retrieve_metadata(bucket,prefix)
 # Commit the changes to the database
