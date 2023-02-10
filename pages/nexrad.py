@@ -50,7 +50,7 @@ with col1:
                 s3client.upload_file(selected_file, USER_BUCKET_NAME, name_of_file)
                 with st.spinner('Almost there...'):
                     time.sleep(5)
-                    st.write("File uploaded successfully!")
+                    st.success('File was successfully uploaded!', icon="✅")
             st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
         except Exception as e:
             st.write("An error occurred:", str(e))
@@ -110,15 +110,14 @@ with col1:
             name_of_file = selected_file
             if(selected_file != 'select'):
                 if check_file_exists(name_of_file, USER_BUCKET_NAME):
-                    st.write(f"The file {name_of_file} already exists in the {USER_BUCKET_NAME} bucket.")
+                    st.success(f"The file {name_of_file} already exists in the {USER_BUCKET_NAME} bucket.", icon="✅")
+
                     st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
                     st.write('Link to file on GEOS website',url_gen_nexrad(name_of_file))
-                    st.success('File was Successfully retireved!', icon="✅")
                 else:
                     st.write(f"The file {name_of_file} does not exist in the {USER_BUCKET_NAME} bucket.")
                     transfer_file_to_S3()
                     st.write('Link to file on GEOS website',url_gen_nexrad(name_of_file))
-                    st.success('File was Successfully retireved!', icon="✅")
 
 
 
