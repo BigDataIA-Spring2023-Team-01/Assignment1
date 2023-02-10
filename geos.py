@@ -5,12 +5,21 @@ from datetime import datetime, date
 import os
 import boto3
 import logging
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 import io
 import requests
 from bs4 import BeautifulSoup
 import time
 # from IPython.core.display import display, HTML
+load_dotenv()
+
+s3client = boto3.client('s3',region_name='us-east-1',
+                        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY'),
+                        aws_secret_access_key = os.environ.get('AWS_SECRET_KEY'))
+
+bucket = 'noaa-goes18'
+prefix = 'ABI-L1b-RadC/'
+
 
 col1, col2 = st.columns(2)
 
