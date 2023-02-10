@@ -62,7 +62,7 @@ with col1:
                 s3client.upload_file(selected_file, USER_BUCKET_NAME, name_of_file)
                 with st.spinner('Almost there...'):
                     time.sleep(5)
-                    st.write("File uploaded successfully")
+                    st.success('File was successfully uploaded!', icon="✅")
             st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
         except Exception as e:
             st.write("An error occurred:", str(e))
@@ -109,16 +109,14 @@ with col1:
     
             if(selected_file != 'select'):
                 if check_file_exists(name_of_file, USER_BUCKET_NAME):
-                    st.write(f"The file {name_of_file} already exists in the S3: {USER_BUCKET_NAME} bucket.")
+                    st.success(f"The file {name_of_file} already exists in the {USER_BUCKET_NAME} bucket.", icon="✅")
                     st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
                     get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
 
-                    st.success('File was Successfully retireved!', icon="✅")
                 else:
                     st.write(f"The file {name_of_file} does not exist in the S3: {USER_BUCKET_NAME} bucket.")
                     transfer_file_to_S3()
                     get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
-                    st.success('File was Successfully retireved!', icon="✅")
 
 with col2:
     
