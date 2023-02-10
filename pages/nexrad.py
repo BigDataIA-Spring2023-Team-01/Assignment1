@@ -13,18 +13,19 @@ import time
 # from IPython.core.display import display, HTML
 load_dotenv()
 
+st.header("Explore the NEXRAD Dataset")
+
 s3client = boto3.client('s3',region_name='us-east-1',
                         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY'),
                         aws_secret_access_key = os.environ.get('AWS_SECRET_KEY'))
 
-bucket = 'noaa-goes18'
-prefix = 'ABI-L1b-RadC/'
+bucket = 'noaa-nexrad-level2'
+# prefix = 'ABI-L1b-RadC/'
 USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 
-col1, col2 = st.columns(2)
+col1, col2 = st.columns(2, gap = 'large')
 
 with col1:
-    st.write("Download file through field selection:")
     #Selecting Year
     year_nexrad = st.selectbox(
         'Please select the year',
@@ -119,12 +120,11 @@ with col1:
 
 
 with col2:
-
     def generate_url_from_filename():
         # Get the filename entered by the user
         filename = st.text_input("Enter the filename:")
         if filename:
-            if st.button("Go to website"):
+            if st.button("Download"):
                 with st.spinner('Fetching link to Nexrad bucket...'):
                     time.sleep(3)
                     # Split the filename into parts
@@ -139,6 +139,6 @@ with col2:
                     
                     # Base URL of the Nexrad website
                     base_url = "https://noaa-nexrad-level2.s3.amazonaws.com/{}/{}/{}/{}/{}".format(year,day_of_year,hour,station_code,filename)
-                    st.write("Access link:", base_url)
+                    st.write("Click the link to download the file :", base_url)
 
     generate_url_from_filename()

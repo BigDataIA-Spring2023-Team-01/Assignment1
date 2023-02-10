@@ -11,6 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 # from IPython.core.display import display, HTML
+st.header("Explore the GEOS-18 Dataset")
 load_dotenv()
 
 s3client = boto3.client('s3',region_name='us-east-1',
@@ -21,7 +22,7 @@ bucket = 'noaa-goes18'
 prefix = 'ABI-L1b-RadC/'
 USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 
-col1, col2 = st.columns(2)
+col1, col2 = st.columns(2, gap = 'large')
 
 with col1:
     #Selecting station 
