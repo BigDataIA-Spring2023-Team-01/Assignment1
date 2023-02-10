@@ -25,9 +25,10 @@ prefix = 'ABI-L1b-RadC/'
 USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 
 
-col1, col2 = st.columns(2)
+col1, col2 = st.columns(2,gap='large')
 
 with col1:
+    st.header("Search using fields ")
     def check_file_exists(filename, bucket_name):
         try:
             s3client.head_object(Bucket=bucket_name, Key=filename)
@@ -92,35 +93,41 @@ with col1:
                 'Please select the Hour',
                 options=retieve_hour(year_geos,day_of_year_geos))
 
-
+    bucket = 'noaa-goes18'
+    prefix = 'ABI-L1b-RadC/{}/{}/{}/'.format(year_geos,day_of_year_geos,hour_of_day)
+    object_list = list_files_as_dropdown(bucket, prefix)
+    selected_file = st.selectbox("Select file for download:", options =object_list)
 
     #Transfering selected file to S3 bucket 
     if st.button('Submit'):
         with st.spinner('Retrieving details for the file you selected, wait for it....!'):
-            time.sleep(3)
             time.sleep(5)
-            bucket = 'noaa-goes18'
-            prefix = 'ABI-L1b-RadC/{}/{}/{}/'.format(year_geos,day_of_year_geos,hour_of_day)
-        object_list = list_files_as_dropdown(bucket, prefix)
-        selected_file = st.selectbox("Select file for download:", options =object_list)
-        final_url = 'https://{}.s3.amazonaws.com/index.html#ABI-L1b-RadC/{}/{}/{}/{}'.format(bucket,year_geos,day_of_year_geos,hour_of_day,selected_file)
-        name_of_file = selected_file
+
+            final_url = 'https://{}.s3.amazonaws.com/index.html#ABI-L1b-RadC/{}/{}/{}/{}'.format(bucket,year_geos,day_of_year_geos,hour_of_day,selected_file)
+            name_of_file = selected_file
+        
     
-   
-        if(selected_file != 'select'):
-            if check_file_exists(name_of_file, USER_BUCKET_NAME):
-                st.write(f"The file {name_of_file} already exists in the S3: {USER_BUCKET_NAME} bucket.")
-                st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
-            else:
-                st.write(f"The file {name_of_file} does not exist in the S3: {USER_BUCKET_NAME} bucket.")
-                transfer_file_to_S3()
-                get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
+            if(selected_file != 'select'):
+                if check_file_exists(name_of_file, USER_BUCKET_NAME):
+                    st.write(f"The file {name_of_file} already exists in the S3: {USER_BUCKET_NAME} bucket.")
+                    st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
+                    get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
+
+                    st.success('File was Successfully retireved!', icon="✅")
+                else:
+                    st.write(f"The file {name_of_file} does not exist in the S3: {USER_BUCKET_NAME} bucket.")
+                    transfer_file_to_S3()
+                    get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
+                    st.success('File was Successfully retireved!', icon="✅")
 
 with col2:
     
+    st.header("Search using file name ")
+
     def generate_url_from_filename():
         # Get the filename entered by the user
         filename = st.text_input("Enter the filename:")
+
         if filename:
             if st.button("Go to website"):
                 with st.spinner('Fetching link to GEOS bucket and downloading...'):

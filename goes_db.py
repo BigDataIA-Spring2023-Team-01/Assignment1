@@ -12,7 +12,6 @@ def query_into_dataframe():
     conn = sqlite3.connect("s3_goes.db")
     cursor = conn.cursor()
     df = pd.read_sql_query("SELECT * FROM folders", conn)
-    print(df)
     conn.close()
 
 def retieve_year():
@@ -41,8 +40,4 @@ def retieve_hour(year,day_of_year):
     tdf = pd.read_sql_query(query, conn,params=(year,day_of_year))
     df = [x for x in tdf]
     conn.close()
-    print(tdf)
     return tdf
-
-df = retieve_hour('2023','001')
-print(df)

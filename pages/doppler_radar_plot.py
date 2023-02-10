@@ -31,7 +31,7 @@ def convert_coordinates(coordinates):
 
 
 # Connect to the database file
-conn = sqlite3.connect("../results/ddl.dbo")
+conn = sqlite3.connect("results/ddl.dbo")
 cursor = conn.cursor()
 
 # Check if the table exists
@@ -44,10 +44,10 @@ if cursor.fetchone():
     
     
     for row in rows:
-        convert_coordinates(row[3])
+        convert_coordinates(row[4])
 else:
     print(f"Table '{table_name}' does not exist")
-    conn = sqlite3.connect("../results/ddl.dbo")
+    conn = sqlite3.connect("results/ddl.dbo")
     cursor = conn.cursor()
 
     # Create the table
@@ -61,14 +61,8 @@ else:
     """)
 
     # Load data from CSV into the table
-    with open("../results/Book1.csv", "r") as f:
-        reader = csv.reader(f)
-        headers = next(reader)
-        cursor.executemany("""
-        INSERT INTO coordinates (state, place,ICAO_Location_Identifier,Coordinates )
-        VALUES (?,?,?,?)
-        """, reader)
-
+    df = pd.read_csv("results/Book.csv",encoding = 'unicode_escape')
+    df.to_sql("coordinates", conn, if_exists="replace")
     # Commit changes and close the connection
     conn.commit()
 
