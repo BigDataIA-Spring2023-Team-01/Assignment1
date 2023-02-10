@@ -8,6 +8,6 @@ We are also plotting the NEXRAD doppler radar's location using streamlit in whic
 
 [Documentation](https://codelabs-preview.appspot.com/?file_id=1pxvMyrZR_KXWuSx69pQdWrG368T-Y48RB9-ZLr438rw#0)
 
-[Application](https://bigdataia-spring2023-team-01-assignment1-geos-cw0mka.streamlit.app/)
+[Application](https://bigdataia-spring2023-team-01-assignment1-geos-p8hd9b.streamlit.app/)
 
 
