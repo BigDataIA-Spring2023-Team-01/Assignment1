@@ -20,7 +20,8 @@ s3client = boto3.client('s3',region_name='us-east-1',
                         aws_secret_access_key = os.environ.get('AWS_SECRET_KEY'))
 
 bucket = 'noaa-nexrad-level2'
-# prefix = 'ABI-L1b-RadC/'
+
+prefix = 'ABI-L1b-RadC/'
 USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 
 col1, col2 = st.columns(2, gap = 'large')

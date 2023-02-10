@@ -92,29 +92,28 @@ with col1:
                 'Please select the Hour',
                 options=retieve_hour(year_geos,day_of_year_geos))
 
-
+    bucket = 'noaa-goes18'
+    prefix = 'ABI-L1b-RadC/{}/{}/{}/'.format(year_geos,day_of_year_geos,hour_of_day)
+    object_list = list_files_as_dropdown(bucket, prefix)
+    selected_file = st.selectbox("Select file for download:", options =object_list)
 
     #Transfering selected file to S3 bucket 
     if st.button('Submit'):
         with st.spinner('Retrieving details for the file you selected, wait for it....!'):
-            time.sleep(3)
             time.sleep(5)
-            bucket = 'noaa-goes18'
-            prefix = 'ABI-L1b-RadC/{}/{}/{}/'.format(year_geos,day_of_year_geos,hour_of_day)
-        object_list = list_files_as_dropdown(bucket, prefix)
-        selected_file = st.selectbox("Select file for download:", options =object_list)
-        final_url = 'https://{}.s3.amazonaws.com/index.html#ABI-L1b-RadC/{}/{}/{}/{}'.format(bucket,year_geos,day_of_year_geos,hour_of_day,selected_file)
-        name_of_file = selected_file
+
+            final_url = 'https://{}.s3.amazonaws.com/index.html#ABI-L1b-RadC/{}/{}/{}/{}'.format(bucket,year_geos,day_of_year_geos,hour_of_day,selected_file)
+            name_of_file = selected_file
+        
     
-   
-        if(selected_file != 'select'):
-            if check_file_exists(name_of_file, USER_BUCKET_NAME):
-                st.write(f"The file {name_of_file} already exists in the S3: {USER_BUCKET_NAME} bucket.")
-                st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
-            else:
-                st.write(f"The file {name_of_file} does not exist in the S3: {USER_BUCKET_NAME} bucket.")
-                transfer_file_to_S3()
-                get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
+            if(selected_file != 'select'):
+                if check_file_exists(name_of_file, USER_BUCKET_NAME):
+                    st.write(f"The file {name_of_file} already exists in the S3: {USER_BUCKET_NAME} bucket.")
+                    st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
+                else:
+                    st.write(f"The file {name_of_file} does not exist in the S3: {USER_BUCKET_NAME} bucket.")
+                    transfer_file_to_S3()
+                    get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
 
 with col2:
     
