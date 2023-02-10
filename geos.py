@@ -19,7 +19,7 @@ s3client = boto3.client('s3',region_name='us-east-1',
 
 bucket = 'noaa-goes18'
 prefix = 'ABI-L1b-RadC/'
-
+USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 
 col1, col2 = st.columns(2)
 
@@ -76,9 +76,9 @@ with col1:
             return False
 
 
-    def get_file_url(year, day_of_year, hour):
+    def get_file_url(year, day_of_year, hour,selected_file):
         # Base URL of the GEOS website
-        base_url = "https://noaa-goes18.s3.amazonaws.com/index.html#ABI-L1b-RadC/"
+        base_url = "https://noaa-goes18.s3.amazonaws.com/ABI-L1b-RadC/"
         
         # Year, day of year, and hour are formatted as strings with leading zeros
         year = str(year).zfill(4)
@@ -86,7 +86,7 @@ with col1:
         hour = str(hour).zfill(2)
         
         # Combine the base URL with the user inputs to get the file URL
-        file_url = base_url + f"{year}/{day_of_year}/{hour}"
+        file_url = base_url + f"{year}/{day_of_year}/{hour}/{selected_file}"
         
         st.write("Link to file on GEOS website ",file_url) 
 
@@ -99,8 +99,8 @@ with col1:
             with open(selected_file, "wb") as data:
                 data.write(requests.get(final_url).content)
                 s3client.upload_file(selected_file, USER_BUCKET_NAME, name_of_file)
-                with st.spinner('Wait for it...'):
-                    time.sleep(7)
+                with st.spinner('Almost there...'):
+                    time.sleep(5)
                     st.write("File uploaded successfully")
             st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
         except Exception as e:
@@ -109,42 +109,25 @@ with col1:
     #Transfering selected file to S3 bucket 
     if st.button('Submit'):
         with st.spinner('Retrieving details for the file you selected, wait for it....!'):
-            time.sleep(5)
+            time.sleep(3)
             if check_file_exists(name_of_file, USER_BUCKET_NAME):
                 st.write(f"The file {name_of_file} already exists in the S3: {USER_BUCKET_NAME} bucket.")
                 st.write('Click to download from S3 bucket', 'https://{}.s3.amazonaws.com/{}'.format(USER_BUCKET_NAME,name_of_file))
             else:
                 st.write(f"The file {name_of_file} does not exist in the S3: {USER_BUCKET_NAME} bucket.")
                 transfer_file_to_S3()
-                get_file_url(year_geos,day_of_year_geos,hour_of_day)
+                get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
 
 with col2:
-
-    # filename_entered = st.text_input("Enter filename for download", placeholder='OR_ABI-L1b-RadC-M6C01_G18_s20230212001171_e20230212003548_c20230212003594.nc')
     
     def generate_url_from_filename():
         # Get the filename entered by the user
         filename = st.text_input("Enter the filename:")
         if filename:
             if st.button("Go to website"):
-                with st.spinner('Fetching link to GEOS bucket...'):
+                with st.spinner('Fetching link to GEOS bucket and downloading...'):
                     time.sleep(3)
-                    # Split the filename into parts
-                    parts = filename.split("_")
-                    
-                    # Get the year, day of year, and hour from the filename
-                    year = parts[5][1:5]
-                    day_of_year = parts[5][5:8]
-                    hour = parts[5][8:10]
-                    
-                    # Base URL of the GEOS website
-                    base_url = "https://noaa-goes18.s3.amazonaws.com/index.html#ABI-L1b-RadC/"
-                    
-                    # Combine the base URL with the year, day of year, and hour to get the URL
-                    file_url = base_url + f"{year}/{day_of_year}/{hour}/"
-                    
-                    # Display the URL
-                    st.write("Access link:", file_url)
+                    get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
 
     generate_url_from_filename()
 
