@@ -30,11 +30,11 @@ def retieve_days(year,month):
     return tdf
 
 def retieve_stations(year,month,day):
-    conn = sqlite3.connect("s3_nexrad.db")
+    conn = sqlite3.connect("results/s3_nexrad.db")
     cursor = conn.cursor()
     query = 'SELECT distinct nexrad_station FROM folders where Is2022 = ? and month = ? and day = ?'
     tdf = pd.read_sql_query(query, conn,params=(year,month,day))
     df = [x for x in tdf]
     conn.close()
 
-    return df
+    return tdf

@@ -10,6 +10,8 @@ import io
 import requests
 from bs4 import BeautifulSoup
 import time
+from nexrad_db import retieve_days,retieve_months,retieve_stations
+
 # from IPython.core.display import display, HTML
 load_dotenv()
 
@@ -27,66 +29,7 @@ USER_BUCKET_NAME = os.environ.get('USER_BUCKET_NAME')
 col1, col2 = st.columns(2, gap = 'large')
 
 with col1:
-    #Selecting Year
-    year_nexrad = st.selectbox(
-        'Please select the year',
-        ('2022', '2023'))
-
-    #Month of Year
-    month_of_year_nexrad = st.text_input('Month of Year ', max_chars=2, type='default', 
-                                    placeholder='Please enter Month of Year in MM format')
-
-    #Day of Month
-    day_of_month_nexrad = st.text_input('Enter Day of Month', max_chars=2, placeholder='Enter Date of Month in DD format')
-
-
-    bucket = 'noaa-nexrad-level2'
-    prefix = '{}/{}/{}/'.format(year_nexrad,month_of_year_nexrad,day_of_month_nexrad)
-
-    #Station code selector 
-    def display_stationcode(bucket_name,prefix):
-        try:
-            result = s3client.list_objects(Bucket=bucket_name, Prefix=prefix, Delimiter ='/')
-            object_list = [x.get("Prefix").split("/")[-2] for x in result.get("CommonPrefixes")]
-            selected_object = st.selectbox("Select station code:", object_list)
-            return selected_object
-        except Exception as e:
-            st.write("An error occurred:", e)
-            return None
-
-    selected_stationcode = display_stationcode(bucket, prefix)
-
-    if display_stationcode:
-        st.write("You selected:", selected_stationcode)
-    else:
-        st.write("No objects found")
-
-    #MADE CHANGES TO BELOW FUNCTION - ADDED PREFIX_FILE 
-    prefix_file = '{}/{}/{}/{}/'.format(year_nexrad,month_of_year_nexrad,day_of_month_nexrad,selected_stationcode)
-    #Filename selector 
-    def list_files_as_dropdown(bucket_name, prefix):
-        try:
-            result = s3client.list_objects(Bucket=bucket_name, Prefix=prefix, Delimiter ='/')
-            object_list = [x["Key"].split("/")[-1] for x in result["Contents"]]
-            selected_object = st.selectbox("Select file for download:", object_list)
-            return selected_object
-        except Exception as e:
-            st.write("An error occurred:", e)
-            return None
-
-    selected_file = list_files_as_dropdown(bucket, prefix_file)
-
-    if selected_file:
-        st.write("You selected:", selected_file)
-    else:
-        st.write("No objects found")
-
-    # https://noaa-nexrad-level2.s3.amazonaws.com/index.html#2023/02/01/DOP1/
-    #URL of file to be uploaded
-
-    final_url = 'https://{}.s3.amazonaws.com/index.html#{}/{}/{}/{}/{}'.format(bucket,year_nexrad,month_of_year_nexrad,day_of_month_nexrad,selected_stationcode,selected_file)
-    name_of_file = selected_file
-
+    
     # check_file_exists
     def check_file_exists(filename, bucket_name):
         try:
@@ -109,15 +52,63 @@ with col1:
         except Exception as e:
             st.write("An error occurred:", str(e))
 
+        
+    def list_files_as_dropdown(bucket_name, prefix):
+        try:
+            result = s3client.list_objects(Bucket=bucket_name, Prefix=prefix, Delimiter ='/')
+            object_list = [x["Key"].split("/")[-1] for x in result["Contents"]]
+            return object_list
+        except Exception as e:
+            st.write("An error occurred:", e)
+            return None
+
+    #Selecting Year
+    year_nexrad = st.selectbox(
+        'Please select the year',
+        ('2022', '2023'))
+    
+    if year_nexrad == '2022':
+        flag = '0'
+    else:
+        flag = '1'
+
+    #Month of Year
+    month_of_year_nexrad = st.selectbox('Please select the Month',options=retieve_months(flag))
+
+    #Day of Month
+    day_of_month_nexrad = st.selectbox('Please select the Day of the month',options=retieve_days(flag,month_of_year_nexrad))
+
+    bucket = 'noaa-nexrad-level2'
+    prefix = '{}/{}/{}/'.format(year_nexrad,month_of_year_nexrad,day_of_month_nexrad)
+
+    #Station code selector 
+    
+    selected_stationcode = st.selectbox('Please select the Day of the month',options=retieve_stations(flag,month_of_year_nexrad,day_of_month_nexrad),key='day')
+
+
+
+    #MADE CHANGES TO BELOW FUNCTION - ADDED PREFIX_FILE 
+    prefix_file = '{}/{}/{}/{}/'.format(year_nexrad,month_of_year_nexrad,day_of_month_nexrad,selected_stationcode)
+    #Filename selector 
+    
+
+    object_list = list_files_as_dropdown(bucket, prefix_file)
+    selected_file = st.selectbox("Select file for download:", object_list,key='file')
+
+
     #Transfering selected file to S3 bucket 
     if st.button('Submit'):
         with st.spinner('Retrieving details for the file you selected, wait for it....!'):
             time.sleep(5)
-            if check_file_exists(name_of_file, USER_BUCKET_NAME):
-                st.write(f"The file {name_of_file} already exists in the {USER_BUCKET_NAME} bucket.")
-            else:
-                st.write(f"The file {name_of_file} does not exist in the {USER_BUCKET_NAME} bucket.")
-                transfer_file_to_S3()
+            
+            final_url = 'https://{}.s3.amazonaws.com/index.html#{}/{}/{}/{}/{}'.format(bucket,year_nexrad,month_of_year_nexrad,day_of_month_nexrad,selected_stationcode,selected_file)
+            name_of_file = selected_file
+            if(selected_file != 'select'):
+                if check_file_exists(name_of_file, USER_BUCKET_NAME):
+                    st.write(f"The file {name_of_file} already exists in the {USER_BUCKET_NAME} bucket.")
+                else:
+                    st.write(f"The file {name_of_file} does not exist in the {USER_BUCKET_NAME} bucket.")
+                    transfer_file_to_S3()
 
 
 with col2:
