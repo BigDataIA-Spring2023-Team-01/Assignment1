@@ -138,7 +138,7 @@ with col2:
             if (flag == '0'):
                 with st.spinner('Fetching link to GEOS bucket and downloading...'):
                     time.sleep(3)
-                    st.write(url_gen_goes(filename))
+                    st.write("Link to the public GEOS Bucket is:",url_gen_goes(filename))
             elif (flag == '1'):
                 st.warning("Enter Valid file name")
             elif (flag == '2') :
