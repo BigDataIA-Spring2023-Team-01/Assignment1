@@ -71,32 +71,26 @@ with col1:
         'Please select the year',
         ('2022', '2023'))
     
-    if year_nexrad == '2022':
-        flag = '0'
-    else:
-        flag = '1'
-
     #Month of Year
-    month_of_year_nexrad = st.selectbox('Please select the Month',options=retieve_months(flag))
+    month_of_year_nexrad = st.selectbox('Please select the Month',options=retieve_months(year_nexrad))
 
     #Day of Month
-    day_of_month_nexrad = st.selectbox('Please select the Day of the month',options=retieve_days(flag,month_of_year_nexrad))
+    day_of_month_nexrad = st.selectbox('Please select the Day of the month',options=retieve_days(year_nexrad,month_of_year_nexrad))
 
   
 
     #Station code selector 
     
-    selected_stationcode = st.selectbox('Please select the station',options=retieve_stations(flag,month_of_year_nexrad,day_of_month_nexrad),key='day')
+    selected_stationcode = st.selectbox('Please select the station',options=retieve_stations(year_nexrad,month_of_year_nexrad,day_of_month_nexrad),key='day')
 
 
 
     #MADE CHANGES TO BELOW FUNCTION - ADDED PREFIX_FILE 
     prefix_file = '{}/{}/{}/{}/'.format(year_nexrad,month_of_year_nexrad,day_of_month_nexrad,selected_stationcode)
     bucket = 'noaa-nexrad-level2'
-    prefix = '{}/{}/{}/'.format(year_nexrad,month_of_year_nexrad,day_of_month_nexrad)
-    #Filename selector 
-    
 
+
+    #Filename selector 
     object_list = list_files_as_dropdown(bucket, prefix_file)
     if(object_list != None):
         selected_file = st.selectbox("Select file for download:", object_list,key='file')
