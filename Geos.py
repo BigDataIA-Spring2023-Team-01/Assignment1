@@ -11,7 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 from goes_db import log_file_download
-from url_generator import file_validator
+from url_generator import file_validator,url_gen_goes
 
 from goes_db import retieve_year, retieve_day_of_year,retieve_hour
 # from IPython.core.display import display, HTML
@@ -138,7 +138,7 @@ with col2:
             if (flag == '0'):
                 with st.spinner('Fetching link to GEOS bucket and downloading...'):
                     time.sleep(3)
-                    get_file_url(year_geos,day_of_year_geos,hour_of_day,selected_file)
+                    st.write(url_gen_goes(filename))
             elif (flag == '1'):
                 st.warning("Enter Valid file name")
             elif (flag == '2') :

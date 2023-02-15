@@ -11,7 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 from nexrad_db import retieve_days,retieve_months,retieve_stations
-from url_generator import url_gen_nexrad
+from url_generator import url_gen_nexrad,file_validator_nexrad
 from goes_db import log_file_download
 
 # from IPython.core.display import display, HTML
@@ -126,23 +126,18 @@ with col2:
 
     def generate_url_from_filename():
         # Get the filename entered by the user
-        filename = st.text_input("Enter the filename:")
-        if filename:
-            if st.button("Download"):
-                with st.spinner('Fetching link to Nexrad bucket...'):
+        filename1 = st.text_input("Enter the filename:")
+        flag = '1'
+
+        if st.button("Go to website"):
+            flag = file_validator_nexrad(filename1)
+            if (flag == '0'):
+                with st.spinner('Fetching link to NEXRAD bucket and downloading...'):
                     time.sleep(3)
-                    # Split the filename into parts
-                    parts = filename.split("_")
-                    
-                    # Get the year, day of year, and hour from the filename
-            
-                    station_code = parts[0][:4]
-                    year = parts[0][4:8]
-                    day_of_year = parts[0][8:10]
-                    hour = parts[0][10:]
-                    
-                    # Base URL of the Nexrad website
-                    base_url = "https://noaa-nexrad-level2.s3.amazonaws.com/{}/{}/{}/{}/{}".format(year,day_of_year,hour,station_code,filename)
-                    st.write("Click the link to download the file :", base_url)
+                st.write("Link to the Public NEXRAD Bucket is:",url_gen_nexrad(filename1))
+            elif (flag == '1'):
+                st.warning("Enter Valid file name")
+            elif (flag == '2') :
+                st.warning("File not present in NEXRAD Bucket")
 
     generate_url_from_filename()

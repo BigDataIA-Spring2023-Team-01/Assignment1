@@ -72,11 +72,12 @@ def file_validator(file_name):
             print(check)
             if(check):
                 return '0'
-            else:
-                return '2'
     
     else:
         return '1'
+    
+    return '2'
+
 
 
 def file_validator_nexrad(file_name):
@@ -97,6 +98,6 @@ def file_validator_nexrad(file_name):
    
 
 
-df = file_validator_nexrad('KLWX19931112_005128.gz')
+df = file_validator('OR_ABI-L1b-RadC-M6C01_G18_s20222550301172_e20222550303545_c20222550303583.nc')
 # df = file_validator('OR_ABI-L1b-RadC-M6C01_G18_s20230410001170_e20230410003543_c20230410003571.nc')
 print(df)
